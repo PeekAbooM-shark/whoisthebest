@@ -1,0 +1,271 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>今天我最棒！</title>
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+      margin: 0;
+      padding: 1rem;
+      background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .select-container,
+    .ranking {
+      background: white;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 280px;
+      box-sizing: border-box;
+    }
+    .ranking h2,
+    .select-container h2 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    select {
+      width: 100%;
+      padding: 0.3rem;
+      border-radius: 8px;
+    }
+    .icon-bar {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .icon-bar span {
+      font-size: 2rem;
+      margin: 0 0.5rem;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .icon-bar span.selected {
+      filter: brightness(0.5);
+    }
+    .scoreboard {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .card {
+      border-radius: 16px;
+      padding: 1rem;
+      width: 250px;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+    .card-middle {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      font-size: 2rem;
+      margin: 0.5rem 0;
+    }
+    .ranking-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .ranking-item {
+      display: flex;
+      align-items: center;
+      font-size: 1rem;
+      gap: 0.5rem;
+    }
+    .medal {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-weight: bold;
+      color: white;
+      text-align: center;
+      line-height: 24px;
+    }
+    .gold {
+      background: gold;
+    }
+    .silver {
+      background: silver;
+    }
+    .bronze {
+      background: peru;
+    }
+    .score-number {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>今天我最棒！</h1>
+  <div class="icon-bar" id="icon-bar">
+    <span data-icon="⭐">⭐</span>
+    <span data-icon="🌙">🌙</span>
+    <span data-icon="🍩">🍩</span>
+    <span data-icon="❤️">❤️</span>
+    <span data-icon="☀️">☀️</span>
+    <span data-icon="🥤">🥤</span>
+  </div>
+
+  <div class="container">
+    <div class="select-container">
+      <h2 id="select-label">今日出勤人数：0人</h2>
+      <p><span id="male-count">男生 👦：0</span>　<span id="female-count">女生 👧：0</span></p>
+      <select id="name-select" multiple size="12">
+        <option>凯哲</option><option>凯瑞</option><option>忠桉</option><option>世颖</option><option>浩宸</option><option>振玮</option><option>小诚</option>
+        <option>健永</option><option>浚翔</option><option>Lakiesh</option><option>Fawaz</option><option>Raqial</option><option>Qais</option>
+        <option>睿涵</option><option>乐姿</option><option>Zuhayra</option><option>柯瑞</option><option>芮敏</option><option>洛芙</option><option>煊霓</option><option>恩绮</option>
+        <option>思颖</option><option>子绮</option><option>Elea</option><option>Nusaybah</option>
+      </select>
+    </div>
+    <div class="ranking">
+      <h2>排行榜</h2>
+      <div class="ranking-list" id="ranking-list">
+        <div class="ranking-item"><div class="medal gold">1</div></div>
+        <div class="ranking-item"><div class="medal silver">2</div></div>
+        <div class="ranking-item"><div class="medal bronze">3</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="scoreboard" id="scoreboard"></div>
+
+  <script>
+    const iconBar = document.getElementById("icon-bar");
+    const nameSelect = document.getElementById("name-select");
+    const scoreboard = document.getElementById("scoreboard");
+    const rankingList = document.getElementById("ranking-list");
+    const selectLabel = document.getElementById("select-label");
+    const maleCount = document.getElementById("male-count");
+    const femaleCount = document.getElementById("female-count");
+
+    const genderMap = {
+      "凯哲": "male", "凯瑞": "male", "忠桉": "male", "世颖": "male", "浩宸": "male", "振玮": "male", "小诚": "male",
+      "健永": "male", "浚翔": "male", "Lakiesh": "male", "Fawaz": "male", "Raqial": "male", "Qais": "male",
+      "睿涵": "female", "乐姿": "female", "Zuhayra": "female", "柯瑞": "female", "芮敏": "female", "洛芙": "female", "煊霓": "female", "恩绮": "female",
+      "思颖": "female", "子绮": "female", "Elea": "female", "Nusaybah": "female"
+    };
+
+    let selectedIcon = "";
+
+    const coldColors = ["#6ca0dc", "#4d8fac", "#7393b3"];
+    const warmColors = ["#ffb6b9", "#f9a875", "#f6c57e", "#f49ac2"];
+
+    function createCard(name) {
+      const gender = genderMap[name];
+      const bgColor = gender === "male"
+        ? coldColors[Math.floor(Math.random() * coldColors.length)]
+        : warmColors[Math.floor(Math.random() * warmColors.length)];
+
+      const card = document.createElement("div");
+      card.className = "card";
+      card.style.backgroundColor = bgColor;
+      card.dataset.name = name;
+      card.dataset.score = 0;
+      card.innerHTML = `
+        <div class="card-header">
+          <div class="card-name">${name}</div>
+          <div class="score-number">0</div>
+        </div>
+        <div class="card-middle">
+          <span class="icon">${selectedIcon}</span>
+          <span class="angry">😠</span>
+        </div>
+      `;
+      const iconEl = card.querySelector(".icon");
+      const angryEl = card.querySelector(".angry");
+      const scoreEl = card.querySelector(".score-number");
+
+      iconEl.addEventListener("click", () => {
+        let score = parseInt(card.dataset.score);
+        score++;
+        card.dataset.score = score;
+        scoreEl.textContent = score;
+        updateRanking();
+      });
+
+      angryEl.addEventListener("click", () => {
+        let score = parseInt(card.dataset.score);
+        score--;
+        card.dataset.score = score;
+        scoreEl.textContent = score;
+        updateRanking();
+      });
+
+      return card;
+    }
+
+    iconBar.addEventListener("click", (e) => {
+      if (e.target.dataset.icon) {
+        [...iconBar.children].forEach(child => child.classList.remove("selected"));
+        e.target.classList.add("selected");
+        selectedIcon = e.target.dataset.icon;
+        document.querySelectorAll(".card .icon").forEach(el => el.textContent = selectedIcon);
+      }
+    });
+
+    nameSelect.addEventListener("change", () => {
+      scoreboard.innerHTML = "";
+      const selectedNames = Array.from(nameSelect.selectedOptions).map(opt => opt.value);
+      selectedNames.forEach(name => {
+        scoreboard.appendChild(createCard(name));
+      });
+
+      selectLabel.textContent = `今日出勤人数：${selectedNames.length}人`;
+      const males = selectedNames.filter(name => genderMap[name] === "male").length;
+      const females = selectedNames.filter(name => genderMap[name] === "female").length;
+      maleCount.textContent = `男生 👦：${males}`;
+      femaleCount.textContent = `女生 👧：${females}`;
+      updateRanking();
+    });
+
+    function updateRanking() {
+      const allCards = Array.from(document.querySelectorAll(".card"));
+      const sorted = allCards
+        .map(card => ({
+          name: card.dataset.name,
+          score: parseInt(card.dataset.score),
+          icon: card.querySelector(".icon").textContent
+        }))
+        .filter(item => item.score > 0)
+        .sort((a, b) => b.score - a.score);
+
+      const medals = ["gold", "silver", "bronze"];
+      rankingList.innerHTML = "";
+      for (let i = 0; i < 3; i++) {
+        const item = sorted[i];
+        const medal = medals[i];
+        const row = document.createElement("div");
+        row.className = "ranking-item";
+        row.innerHTML = `<div class="medal ${medal}">${i + 1}</div>`;
+        if (item) {
+          row.innerHTML += `<span>${item.name}</span> <span>${item.score}</span> <span>${item.icon}</span>`;
+        }
+        rankingList.appendChild(row);
+      }
+    }
+  </script>
+</body>
+</html>
